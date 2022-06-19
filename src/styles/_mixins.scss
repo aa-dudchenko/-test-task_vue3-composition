@@ -1,0 +1,30 @@
+@mixin bg__cross-browser-gradient {
+  background: #2463c7; /* Для старых браузеров - без градиента */
+  background: -moz-linear-gradient(top,  #2463c7 0%, #bf0a07 240%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e27a7a), color-stop(240%,#bf0a07)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #2463c7 0%,#bf0a07 240%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #2463c7 0%,#bf0a07 240%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #2463c7 0%,#bf0a07 240%); /* IE10+ */
+  background: linear-gradient(to bottom,  #2463c7 0%,#bf0a07 240%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2463c7', endColorstr='#bf0a07',GradientType=0 ); /* IE6-9 */
+}
+
+@mixin text-shadow ($color: $clr-dark) {
+  text-shadow:
+    1px 1px 1px $color,
+    -1px 1px 1px $color;  
+}
+
+@mixin hr-after ($width: 100%) {
+    content: "";
+    display: block;
+    position: relative;
+    z-index: -1;
+    width: $width;
+    margin: auto;
+    border-bottom: 3px solid $clr-white;
+    border-radius: 3px;
+    bottom: 0px;
+    transition: all .3s;
+}
+

@@ -1,6 +1,6 @@
-# alyans-test-vue3
+# alyans-test-vue3-composition
 ### **Тестовое задание по Vue-3** 
-(Проект в разработке)
+*(Аналог данного проекта: https://github.com/aa-dudchenko/test-task_vue3 , но полностью пепеписанный на Composition API)* 
 ### *(см. описание требований к заданию в файле: junmidFrontEnd.png)* 
 ***<https://test-task-vue3.netlify.app>***
 

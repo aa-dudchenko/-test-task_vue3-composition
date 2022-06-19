@@ -1,0 +1,23 @@
+.title {
+  font-size: 32px;
+  color: $clr-dark;
+  @include text-shadow($clr-blue);
+}
+
+
+.link {
+  transition: all .3s;
+  cursor: pointer;
+
+  &:hover {
+    @include text-shadow($clr-blue)
+  }
+
+  &:after {
+    @include hr-after(0%);
+  }
+
+  &:hover:after {
+    width: 100%;
+  }
+}

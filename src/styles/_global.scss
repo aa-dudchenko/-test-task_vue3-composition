@@ -1,0 +1,24 @@
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  padding-bottom: 40px;
+
+  font-family: 'Acme', sans-serif;
+  font-weight: 300;
+  font-size: $font-size;
+  color: $clr-white;
+  @include text-shadow($clr-dark);
+
+  @include bg__cross-browser-gradient;
+
+}
+
+.container {
+  max-width: 1400px; 
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
+
