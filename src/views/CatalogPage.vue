@@ -5,8 +5,8 @@
 
     <div class="catalog-page__search">
       <search-block
-          :search_query = "searchQuery"
-          @changedSearchQuery = "searchQuery = $event"
+        :search_query = "searchQuery"
+        @changedSearchQuery = "searchQuery = $event"
       />
     </div>
 
@@ -19,9 +19,9 @@
 
     <div class="catalog-page__pagination">
       <pagination-block
-          :pages = "pages"
-          :page_number = "pageNumber"
-          @changedPageNumber = "pageNumber = $event"
+        :pages = "pages"
+        :page_number = "pageNumber"
+        @changedPageNumber = "pageNumber = $event"
       />
     </div>
 
@@ -29,106 +29,85 @@
 </template>
 
 
-<script>
-  import SearchBlock from '@/components/catalog/SearchBlock.vue'
-  import ListBlock from '@/components/catalog/ListBlock.vue'
-  import PaginationBlock from '@/components/catalog/PaginationBlock.vue'
-  import { mapGetters,  mapActions } from 'vuex'
+<script setup>
+  import { ref } from "@vue/reactivity";
+  import { computed, onMounted, watch, defineAsyncComponent } from "@vue/runtime-core";
+  import { useStore } from 'vuex'
 
-  export default {
-    name: 'CatalogPage',
+  const SearchBlock = defineAsyncComponent(() => import('@/components/catalog/SearchBlock.vue'))
+  const ListBlock = defineAsyncComponent(() => import('@/components/catalog/ListBlock.vue'))
+  const PaginationBlock = defineAsyncComponent(() => import('@/components/catalog/PaginationBlock.vue'))
 
-    components: {
-      SearchBlock,
-      ListBlock,
-      PaginationBlock,
-    },
+  const store = useStore()
 
-    data () {
-      return {
-        searchQuery: '',
+  const searchQuery = ref('')
+  const productsPerPage = ref(100)
+  const pageNumber = ref(1)
+  const filteredProducts = ref([])
 
-        productsPerPage: 100,
-        pageNumber: 1,
 
-        filteredProducts: [],
-      }
-    },
+  watch(searchQuery, () => {
+    filterProducts ()
+    if (searchQuery.value === '') {
+      pageNumber.value = 1
+    }
+  })
 
-    watch: {
+  watch(pageNumber, () => {
+    sessionStorage.setItem('selectedPage', pageNumber.value)
+  })
 
-      searchQuery () {
-       this.filterProducts ()
-        if (this.searchQuery === '') {
-          this.pageNumber = 1
-        }
-      },
+  const PRODUCTS = computed(() => store.getters.PRODUCTS)
 
-      pageNumber () {
-        sessionStorage.setItem('selectedPage', this.pageNumber)
-      }
-    },
+  const pages = computed(() => {
+    const availablePages =  Math.ceil (filteredProducts.value.length / productsPerPage.value)
+    if (availablePages > 0 && availablePages < pageNumber.value) {
+      pageNumber.value = 1
+    }
+    return availablePages
+  })
 
-    methods: {
-      ...mapActions(['GET_PRODUCTS_FROM_API',]),
+  const paginatedProducts = computed(() => {
+    let from = (pageNumber.value - 1) * productsPerPage.value
+    let to = from + productsPerPage.value
+    return filteredProducts.value.slice( from, to )
+  })
 
-      filterProducts () {
-        sessionStorage.setItem('searchedByQuery', this.searchQuery)
-        if (this.searchQuery !== '') {
-          const filterResult =  this.PRODUCTS.filter( product => {
-            return product.name.toLowerCase().indexOf(this.searchQuery.trim().toLowerCase()) !== -1
-          })
-          this.filteredProducts = [...filterResult]
-        } else {
-          this.filteredProducts = this.PRODUCTS
-        }
-      },
 
-    },
-
-    computed: {
-      ...mapGetters(['PRODUCTS']),
-
-      pages () {
-        const availablePages =  Math.ceil (this.filteredProducts.length / this.productsPerPage)
-        if (availablePages > 0 && availablePages < this.pageNumber) {
-          this.pageNumber = 1
-        }
-        return availablePages
-      },
-
-      paginatedProducts () {
-        let from = (this.pageNumber - 1) * this.productsPerPage
-        let to = from + this.productsPerPage
-        return this.filteredProducts.slice( from, to )
-      }
-    },
-
-    mounted () {
-      this.GET_PRODUCTS_FROM_API()
-          .then( response => {
-            if(response) {
-              console.log('DATA RECEIVED')
-            } else { console.log('DATA WAS NOT RECEIVED') }
-          })
-            .then(() => {
-              this.filterProducts()
-            })
-
-      const storedSearchQuery = sessionStorage.getItem('searchedByQuery')
-      // console.log(storedSearchQuery, storedFilterResult)
-      if (storedSearchQuery !== null) {
-        this.searchQuery = storedSearchQuery
-      }
-
-      const storedPageNumber = sessionStorage.getItem('selectedPage')
-      if (storedPageNumber !== null) {
-        this.pageNumber = Number(storedPageNumber)
-      }
-
-    },
-
+  function filterProducts () {
+    sessionStorage.setItem('searchedByQuery', searchQuery.value)
+    if (searchQuery.value !== '') {
+      const filterResult =   PRODUCTS.value.filter( product => {
+        return product.name.toLowerCase().indexOf(searchQuery.value.trim().toLowerCase()) !== -1
+    })
+      filteredProducts.value = [...filterResult]
+    } else {
+      filteredProducts.value =  PRODUCTS.value
+    }
   }
+
+
+  onMounted (() =>  {
+    store.dispatch('GET_PRODUCTS_FROM_API')
+      .then( response => {
+        if(response) {
+          console.log('DATA RECEIVED')
+        } else { console.log('DATA WAS NOT RECEIVED') }
+      })
+        .then(() => {
+          filterProducts()
+        })
+
+  const storedSearchQuery = sessionStorage.getItem('searchedByQuery')
+    if (storedSearchQuery !== null) {
+      searchQuery.value = storedSearchQuery
+    }
+
+  const storedPageNumber = sessionStorage.getItem('selectedPage')
+    if (storedPageNumber !== null) {
+      pageNumber.value = Number(storedPageNumber)
+    }
+})
 </script>
 
 
@@ -158,5 +137,5 @@
     }
 
   }
-
+  
 </style>

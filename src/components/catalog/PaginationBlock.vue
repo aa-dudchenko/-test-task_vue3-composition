@@ -4,7 +4,7 @@
       <div
           class="pagination-block__page"
           v-for="page in pages"
-          key="page"
+          :key="page"
           :class="{'pagination-block__page_active': page === page_number}"
           @click="pageClick(page)"
       >
@@ -15,25 +15,20 @@
 </template>
 
 
-<script>
-  export default {
-    name: 'PaginationBlock',
+<script setup>
+  const emits = defineEmits(['changedPageNumber'])
 
-    props: {
-      pages: {
+  defineProps({
+     pages: {
         type: Number,
       },
       page_number: {
         type: Number,
       }
-    },
+  })
 
-    methods: {
-      pageClick(page) {
-        this.$emit('changedPageNumber', page)
-      }
-    }
-
+  function pageClick(page) {
+    emits('changedPageNumber', page)
   }
 </script>
 

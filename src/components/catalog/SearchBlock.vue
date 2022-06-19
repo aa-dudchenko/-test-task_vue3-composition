@@ -21,38 +21,28 @@
 </template>
 
 
-<script>
-  export default {
-    name: 'SearchBlock',
+<script setup>
+  import { watchEffect } from "@vue/runtime-core"
+  import { ref } from "@vue/reactivity";
 
-    props: {
-      search_query: String
-    },
+  const emits = defineEmits ( ['changedSearchQuery'] )
 
-    data () {
-      return {
-        isActive: false,
-        searchQuery: '',
-      }
-    },
-    
-    methods: {
-      openSearch () {
-        this.isActive = !this.isActive
-      },
+  const props = defineProps ( {
+    search_query: String
+  } )
 
-      changeSearchQuery() {
-        this.$emit('changedSearchQuery', this.searchQuery)
-      }
-    },
+  const isActive = ref( false )
+  const searchQuery = ref( '' )
 
-    watch: {
-      search_query() {
-        this.searchQuery = this.search_query
-      },
-    },
-
+  function openSearch () {
+    isActive.value = !isActive.value
   }
+
+  function changeSearchQuery() {
+    emits('changedSearchQuery', searchQuery.value)
+  }
+
+  watchEffect( () =>  searchQuery.value = props.search_query )
 </script>
 
 
@@ -126,7 +116,6 @@
     }
 
   }
-
 
 </style>
 

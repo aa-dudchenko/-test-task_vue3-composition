@@ -24,7 +24,7 @@
             <span class="about__text-value"> {{ apiData.base_experience }} </span>
           </p>
 
-          <p class="about__text about__text_ul"> Abilities: </p>
+          <p class="about__text about__text_ul"> Abilities assigned to a character: </p>
           <ul class="about__list">
             <li
                 class="about__list-item"
@@ -90,51 +90,36 @@
 </template>
 
 
-<script>
+<script setup>
+  import { computed ,onMounted } from '@vue/runtime-core'
+  import { ref } from '@vue/reactivity'
   import axios from 'axios'
 
-  export default {
-    name: 'AboutView',
+  const props = defineProps ({
+    pokemon_index: {
+      type: Number
+    }
+  })
 
-    props: {
-      pokemon_index: {
-        type: Number
+  const pokemonNumber = ref(props.pokemon_index)
+  const apiData = ref({})
+
+  async function getPokemonData () {
+    try {
+        const products=await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber.value}/`)
+        apiData.value = products.data
+        return products.data
+    } catch(error) {
+        console.log(error)
+        return error
       }
-    },
-
-    data () {
-      return {
-        pokemonNumber: this.pokemon_index,
-        apiData: {},
-      }
-    },
-
-    methods: {
-      async getPokemonData () {
-        try {
-            const products=await axios.get(`https://pokeapi.co/api/v2/pokemon/${this.pokemonNumber}/`)
-            // console.log(products.data)
-            this.apiData = products.data
-            return products.data
-          } catch(error) {
-            console.log(error)
-            return error
-          }
-      }
-    },
-
-    computed: {
-      imgSrc () {
-        return this.apiData.sprites?.other['official-artwork']?.front_default
-      }
-    },
-
-    mounted () {
-      this.getPokemonData ()
-    },
-
-
   }
+
+  const imgSrc = computed(() => apiData.value.sprites?.other['official-artwork']?.front_default)
+
+  onMounted (() => {
+    getPokemonData ()
+  })
 </script>
 
 
@@ -224,6 +209,7 @@
         margin-top: 0;
       }
     }
+    
   }
 
 </style>
