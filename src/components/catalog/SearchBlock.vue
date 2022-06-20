@@ -47,8 +47,7 @@
 
 
 <style lang="scss">
-  @import '../../styles/style.scss';
-
+  
   .search-block {
 
     &__container {

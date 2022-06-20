@@ -33,8 +33,7 @@
 
 
 <style lang="scss">
-  @import '../../styles/style.scss';
-
+  
   .list-block {
     display: flex;
     flex-wrap: wrap;
